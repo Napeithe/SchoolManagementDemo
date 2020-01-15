@@ -1,0 +1,38 @@
+﻿@using SchoolManagement.Features.Shared
+@model int
+
+
+
+@(await Html.PartialAsync("_title", new TitleViewModel("Importowanie użytkowników do grupy", Url.Action("Detail", new {id = Model}))))
+
+<div class="row">
+    <div class="col">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary"> Import użytkowników do grupy</h6>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    <input name="GroupId" value="@Model" class="d-none" />
+                    <div class="row">
+                        <div class="col-4">
+                            <input type="file" id="fUpload" name="files" class="form-control-file" />
+                        </div>
+                        <div class="col">
+                            <button type="button" id="btnUpload" class="btn btn-primary">Importuj</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        let options = {
+            url: '@Url.Action("PostImport")'
+        }
+        app.groupClass.participantImport.init(options);
+    </script>
+}

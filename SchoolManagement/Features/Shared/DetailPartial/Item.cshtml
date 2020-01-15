@@ -1,0 +1,39 @@
+﻿@using SchoolManagement.Features.Shared.DetailPartial
+@model SchoolManagement.Features.Shared.DetailPartial.ItemDetail
+
+<div class="col-sm col-md ">
+    <div class="row border-bottom-light ">
+        @switch (Model.Type)
+        {
+            case ItemDetail.DetailType.Simple:
+                <div class="col-12 col-sm-6 col-md-4">
+                    <strong>@Model.Title</strong>
+                </div>
+                <div class="col-12 col-sm-6 col-md-8">
+                    @Model.Value
+                </div>
+                break;
+            case ItemDetail.DetailType.Checkbox:
+                <div class="col-12 col-sm-6 col-md-4">
+                    <strong>@Model.Title</strong>
+                </div>
+                <div class="col-12 col-sm-6 col-md-8">
+                    @((bool)Model.Value ? "Tak" : "Nie")
+                </div>
+                break;
+            case ItemDetail.DetailType.List:
+                <div class="col-12 col-sm-6 col-md-4">
+                    <strong>@Model.Title</strong>
+                </div>
+                <div class="col-12 col-sm-6 col-md-8">
+                    <ul class="pl-0">
+                        @foreach (var item in Model.Items)
+                        {
+                            <li style=" display: block">@item</li>
+                        }
+                    </ul>
+                </div>
+                break;
+        }
+    </div>
+</div>

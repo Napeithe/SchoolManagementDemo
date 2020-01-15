@@ -1,0 +1,23 @@
+﻿@using Model.Auth
+@using SchoolManagement.Features.Shared
+@using SchoolManagement.Infrastructure.Identity
+@model List<SchoolManagement.Features.Rooms.List.RoomDto>
+
+
+@(await Html.PartialAsync("_title", new TitleViewModel("Pokoje")))
+
+<div id="roomList"></div>
+<div class="mt-3 mb-3">
+    <a role="button" class="btn btn-primary" asp-controller="Rooms" asp-action="Add">Dodaj pokój</a>
+</div>
+
+@section Scripts
+{
+    <script>
+        var options = {
+            dataSet: @Html.Raw(Json.Serialize(Model)),
+            editRoom: '@(User.HasPermissionClaim(Permissions.Rooms.EditRoom) ? Url.Action("Edit") : "#")'
+        }
+        app.rooms.init(options);
+    </script>
+}

@@ -1,0 +1,37 @@
+﻿@model Model.Dto.IUpdatePass
+
+
+@Html.HiddenFor(x => x.Id)
+@Html.HiddenFor(x => x.MemberId)
+<div class="card shadow mb-4">
+
+    <a href="#generalData" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="generalData">
+        <h6 class="m-0 font-weight-bold text-primary">Karnet</h6>
+    </a>
+
+    <div class="collapse show" id="generalData">
+        <div class="card-body">
+            <div class="form-group">
+                <label asp-for="NumberOfEntry" class="align-content-start">Liczba wejść</label>
+                <input asp-for="NumberOfEntry" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Price" class="col-form-label">Cena</label>
+                <input asp-for="Price" class="form-control" />
+            </div>
+            <div class="form-group">
+                <div class="form-check-inline">
+                    <label asp-for="IsStudent" class="form-check-label">Czy student</label>
+                    <input asp-for="IsStudent" class="form-check-input ml-2" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="form-check-inline">
+                    <label asp-for="WasPaid" class="form-check-label">Czy zapłacone</label>
+                    <input asp-for="WasPaid" type="checkbox" class="form-check-input ml-2" />
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-2 mb-2 float-right">Zapisz</button>
+        </div>
+    </div>
+</div>

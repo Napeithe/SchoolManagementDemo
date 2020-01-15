@@ -1,0 +1,11 @@
+﻿@using SchoolManagement.Features.Shared
+@model Model.Dto.IUpdatePass
+
+@await Html.PartialAsync("_title", new TitleViewModel("Dodawanie karnetu", Url.Action("Detail", "GroupMember", new { memberId = Model.MemberId })))
+<div class="row">
+    <div class="col">
+        <form action="@Url.Action("AddAction", "Pass")" id="addGroupForm">
+            @(await Html.PartialAsync("~/Features/Pass/PassDetail/Index.cshtml"))
+        </form>
+    </div>
+</div>

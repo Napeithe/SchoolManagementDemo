@@ -1,0 +1,219 @@
+﻿@using Model.Domain
+@using SchoolManagement.Features.GroupClass.Add
+@using SchoolManagement.Features.Shared
+@using SchoolManagement.Features.Shared.Components.SearchComponent
+@using SchoolManagement.Features.Shared.Components.SelectComponent
+@using DayOfWeek = Model.Dto.DayOfWeek
+@model SchoolManagement.Features.GroupClass.Add.UpdateViewModel
+
+@if (Model.IsEdit)
+{
+    @(await Html.PartialAsync("_title", new TitleViewModel("Edycja grupy zajęciowej", Url.Action("Detail", new { id = Model.GroupClassId }))))
+}
+else
+{
+    @(await Html.PartialAsync("_title", new TitleViewModel("Dodaj nową grupę zajęciową", Url.Action("Index"))))
+}
+@{
+    var action = Model.IsEdit ? "EditGroup" : "AddGroup";
+}
+<div class="row">
+    <div class="col">
+        <form action="@Url.Action(action)" id="addGroupForm">
+            @Html.HiddenFor(x => x.GroupClassId)
+            <div class="card shadow mb-4">
+
+                <a href="#generalData" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="generalData">
+                    <h6 class="m-0 font-weight-bold text-primary">Dane ogólne</h6>
+                </a>
+
+                <div class="collapse show" id="generalData">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label asp-for="Name">Nazwa grupy</label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="ParticipantLimit">Limit miejsc</label>
+                            <input asp-for="ParticipantLimit" class="form-control" />
+                            <span asp-validation-for="ParticipantLimit" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="@nameof(Model.GroupLevelId)">Poziom zajęć</label>
+                            @await Component.InvokeAsync("SelectComponent", new
+                            {
+                                selectViewModel = new SelectViewModel(nameof(Model.GroupLevelId), Model.GroupLevelId),
+                                query = new SchoolManagement.Features.GroupLevels.Query()
+                            })
+                            <span asp-validation-for="GroupLevelId" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="@nameof(Model.RoomId)">Sala</label>
+                            @await Component.InvokeAsync("SelectComponent", new
+                            {
+                                selectViewModel = new SelectViewModel(nameof(Model.RoomId), Model.RoomId),
+                                query = new SchoolManagement.Features.Rooms.SelectListRoom.Query()
+                            })
+                            <span asp-validation-for="RoomId" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="@nameof(Model.Anchors)">Wybierz prowadzących</label>
+                            @await Component.InvokeAsync("SelectComponent", new
+                            {
+                                selectViewModel = new SelectViewModel(nameof(Model.Anchors), Model.Anchors),
+                                query = new Query()
+                            })
+                            <span asp-validation-for="Anchors" class="text-danger"></span>
+                        </div>
+                        <div class="form-check">
+                            <input asp-for="IsSolo" class="form-check-input" type="checkbox">
+                            <label asp-for="IsSolo">Czy są to zajęcia solo?</label>
+                            <span asp-validation-for="IsSolo" class="text-danger"></span>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+            <div class="card shadow mb-4">
+                <a href="#passData" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="passData">
+                    <h6 class="m-0 font-weight-bold text-primary">Dane karnetu</h6>
+                </a>
+
+                <div class="collapse show" id="passData">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label asp-for="PassPrice">Cena</label>
+                            <input asp-for="PassPrice" class="form-control" />
+                            <span asp-validation-for="PassPrice" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow mb-4">
+                <a href="#schedule" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="schedule">
+                    <h6 class="m-0 font-weight-bold text-primary">Harmonogram</h6>
+                </a>
+                <div class="collapse show" id="schedule">
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label for="Class-Start">Data rozpoczęcia</label>
+                                <input asp-for="Start" class="d-none" id="Start" />
+                                <div class="input-group date" id="startDate" data-target-input="nearest">
+                                    <input type="text" class="form-control " data-target="#startDate" name="Class-Start" id="Class-Start" value="@Model.Start.ToString("dd.MM.yyyy")" />
+                                    <div class="input-group-append" data-target="#startDate" data-toggle="datetimepicker">
+                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label asp-for="Start">Czas trwania zajęć (m)</label>
+                                <input asp-for="DurationTimeInMinutes" class="form-control" min="1" />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label asp-for="Start">Liczba zajęć w cyklu</label>
+                                <input asp-for="NumberOfClasses" class="form-control" min="1" />
+                            </div>
+                        </div>
+                        <div id="terms">
+                            @{ int dayIndex = 0;}
+                            @foreach (var term in Model.DayOfWeeks)
+                            {
+                                <div class="form-row" id="term-@dayIndex">
+                                    <div class="form-group col-md-6">
+                                        <label asp-for="Start">Termin @(dayIndex + 1)</label>
+                                        <select name="DayOfWeeks[@(dayIndex)].DayOfWeek" class="form-control" asp-items="DayOfWeek.GetItems" asp-for="@term.DayOfWeek" id="DayOfWeekSelect-@dayIndex">
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-5">
+                                        <label asp-for="Start">Godzina rozpoczęcia</label>
+                                        <div class="input-group date" id="startTime-@dayIndex" data-target-input="nearest">
+                                            <input type="text" class="form-control " data-target="#startTime-@dayIndex" name="DayOfWeeks[@(dayIndex)].BeginTime" id="BeginTime-@dayIndex" value="@term.BeginTime" />
+                                            <div class="input-group-append" data-target="#startTime-@dayIndex" data-toggle="datetimepicker">
+                                                <div class="input-group-text"><i class="fa fa-clock"></i></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-1 d-flex align-items-end">
+                                        <button type="button" onclick="app.groupClass.add.removeTerm('#term-@dayIndex')" class="btn btn-danger"><span><i class="fa fa-recycle "></i></span></button>
+                                    </div>
+                                </div>
+                                dayIndex++;
+                            }
+                        </div>
+                        <button type="button" class="btn btn-secondary" onclick="app.groupClass.add.addTerm()">Dodaj termin</button>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="card shadow mb-4">
+                <a href="#participants" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="participants">
+                    <h6 class="m-0 font-weight-bold text-primary">Uczestnicy</h6>
+                </a>
+                <div class="collapse show" id="participants">
+                    <div class="card-body">
+                        <div id="role-set">
+                            <div class="form-check form-check-inline">
+                                <fieldset id="participantRole">
+                                    <div class="form-check form-check-inline d-none">
+                                        <input class="form-check-input" type="radio" name="role" id="noneRadio" value="@((int) ParticipantRole.None)" checked="checked">
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="role" id="leaderRadio" value="@((int) ParticipantRole.Leader)" checked="checked">
+                                        <label class="form-check-label" for="leaderRadio">Leader</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="role" id="followRadio" value="@((int) ParticipantRole.Follower)">
+                                        <label class="form-check-label" for="followRadio">Follower</label>
+                                    </div>
+                                </fieldset>
+
+                            </div>
+                        </div>
+                        <div>Znajdź i dodaj uczestnika</div>
+                        @await Component.InvokeAsync("SearchComponent",
+                            new SearchViewModel("participantSearch",
+                                Url.Action("ParticipantSearch", "Participants"),
+                                "app.groupClass.add.addUserToTable",
+                                "app.groupClass.add.getSelectedUser"))
+                        <div class="table-responsive mt-3">
+                            <div id="selectedUsers" class="d-none">
+                                @{
+                                    int index = 0;
+                                    foreach (var participant in Model.Participants)
+                                    {
+                                        <input name="participants[@index].id" value="@participant.Id" data-id="@participant.Id" />
+                                        <input name="participants[@index].role" value="@((int) participant.Role)" data-id="@participant.Id" data-roleName="@participant.Role" />
+                                        <input name="participants[@index].name" value="@participant.Name" data-id="@participant.Id" />
+
+                                        index++;
+                                    }
+                                }
+
+                            </div>
+                            <table id="participantsTable" class="table table-bordered" width="100%"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-2">Zapisz</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts{
+    <script asp-paste-key="selectComponent"></script>
+
+    <script>
+        var options = {
+            getUserUrl: '@Url.Action("GetParticipant","GroupClass")',
+            selectedUsersId: [],
+            daysOfWeek: @Html.Raw(Json.Serialize(DayOfWeek.GetItems.Select(x=>new {id=x.Value, text=x.Text})))
+        };
+        app.groupClass.add.init(options);
+    </script>
+}

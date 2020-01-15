@@ -1,0 +1,244 @@
+﻿@using Model.Auth
+@using Model.Domain
+@using SchoolManagement.Features.Shared
+@using SchoolManagement.Infrastructure.Identity
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel szkoły</title>
+
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+              asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute"
+              crossorigin="anonymous"
+              integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" />
+    </environment>
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+          integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous"
+          asp-fallback-href="~/lib/fontawesome-free/all.min.js">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/lib/select2-bootstrap4.min.css" />
+    <link rel="stylesheet" href="~/lib/datatables/datatables.min.css" />
+    <link rel="stylesheet" href="~/lib/sb-admin-2.min.css" />
+
+    <link rel="stylesheet" href="~/lib/bootstrap-colorpicker/bootstrap-colorpicker.min.css" />
+
+    <link rel="stylesheet" href="~/lib/fullcalendar/core/main.min.css" />
+    <link rel="stylesheet" href="~/lib/fullcalendar/daygrid/main.min.css" />
+    <link rel="stylesheet" href="~/lib/fullcalendar/timegrid/main.min.css" />
+    <link rel="stylesheet" href="~/lib/fullcalendar/bootstrap/main.min.css" />
+
+    <link rel="stylesheet" href="~/lib/Noty/noty.min.css" rel="stylesheet">
+
+
+    <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.5.0/css/bootstrap4-toggle.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.1.2/css/tempusdominus-bootstrap-4.min.css" />
+
+    <environment include="Development">
+        <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+    </environment>
+    
+
+
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+    <link rel="icon" type="image/x-icon" href="/favicon.png">
+
+
+</head>
+<body id="page-top" class="sidebar-toggled">
+
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion toggled" id="accordionSidebar">
+
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
+                <div class="sidebar-brand-icon rotate-n-15">
+                    <i class="fas fa-laugh-wink"></i>
+                </div>
+                <div class="sidebar-brand-text mx-3">Retro Dance Studio</div>
+            </a>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Nav Item - Dashboard -->
+            @if (User.HasPermissionClaim(Permissions.Users.SeeAllUser))
+            {
+                @(await Html.PartialAsync("_navItemPartial", NavItemPartial.Create("Użytkownicy", "Users", "Index","fa-users")))
+            }
+
+            @if (User.HasPermissionClaim(Permissions.Calendar.General))
+            {
+                @(await Html.PartialAsync("_navItemPartial", NavItemPartial.Create("Kalendarz", "Calendar", "Index","fa-calendar-alt")))
+            }
+
+
+            @if (User.HasPermissionClaim(Permissions.GroupClass.General))
+            {
+                @(await Html.PartialAsync("_navItemPartial", NavItemPartial.Create("Grupy zajęciowe", "GroupClass", "Index","fa-layer-group")))
+            }
+
+            @if (User.HasPermissionClaim(Permissions.Rooms.General))
+            {
+                @(await Html.PartialAsync("_navItemPartial", NavItemPartial.Create("Pokoje", "Rooms", "Index","fa-door-open")))
+            }
+
+            @if (User.HasPermissionClaim(Permissions.Anchors.General))
+            {
+                @(await Html.PartialAsync("_navItemPartial", NavItemPartial.Create("Prowadzący", "Anchors", "Index","fa-chalkboard-teacher")))
+            }
+
+            @if (User.HasPermissionClaim(Permissions.Participants.General))
+            {
+                @(await Html.PartialAsync("_navItemPartial", NavItemPartial.Create("Uczestnicy", "Participants", "Index","fa-id-card")))
+            }
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
+        </ul>
+        <!-- End of Sidebar -->
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+
+                    @if (User.IsAuthenticated())
+                    {
+                        <!-- Topbar Navbar -->
+                        <ul class="navbar-nav ml-auto">
+
+
+                            <div class="topbar-divider d-none d-sm-block"></div>
+
+                            <!-- Nav Item - User Information -->
+                            <li class="nav-item dropdown no-arrow">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span class="mr-2 d-none d-lg-inline text-gray-600 small">@User.GetName()</span>
+                                    <img class="img-profile rounded-circle" src="~/img/icons8-name-50.png">@*logo 60x60*@
+                                </a>
+                                <!-- Dropdown - User Information -->
+                                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                                    <a class="dropdown-item" href="#">
+                                        <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                        Profil
+                                    </a>
+                                    <div class="dropdown-divider"></div>
+                                    <a asp-action="Logout" asp-controller="Account" class="dropdown-item">
+                                        <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                        Wyloguj
+                                    </a>
+                                </div>
+                            </li>
+                        </ul>
+                    }
+
+
+                </nav>
+                <!-- End of Topbar -->
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+                    @(await Html.PartialAsync("_successMessage"))
+                    @(await Html.PartialAsync("_errorMessage"))
+
+
+                    @RenderBody()
+                    <environment include="Development">
+                        @*<mini-profiler />*@
+                    </environment>
+
+                </div>
+                <!-- /.container-fluid -->
+
+            </div>
+            <!-- End of Main Content -->
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    &copy; 2019 - Retro Dance Studio
+                </div>
+            </footer>
+            <!-- End of Footer -->
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+
+
+    <environment include="Development">
+        <script src="~/lib/jquery/dist/jquery.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"
+                asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
+                asp-fallback-test="window.jQuery"
+                crossorigin="anonymous"
+                integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=">
+        </script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"
+                asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"
+                asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
+                crossorigin="anonymous"
+                integrity="sha384-xrRywqdh3PHs8keKZN+8zzc5TX0GRTLCcmivcbNJWm2rs5C8PRhcEn3czEjhAO9o">
+        </script>
+    </environment>
+    <script src="//malihu.github.io/custom-scrollbar/jquery.mCustomScrollbar.concat.min.js"></script>
+
+    <script src="~/lib/sb-admin-2.min.js"></script>
+    <script src="~/lib/datatables/datatables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/js/i18n/pl.js"></script>
+
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.1.2/js/tempusdominus-bootstrap-4.min.js"></script>
+
+    <script src="~/lib/fullcalendar/core/main.min.js"></script>
+    <script src="~/lib/fullcalendar/core/pl.js"></script>
+    <script src="~/lib/fullcalendar/daygrid/main.min.js"></script>
+    <script src="~/lib/fullcalendar/timegrid/main.min.js"></script>
+    <script src="~/lib/fullcalendar/interaction/main.min.js"></script>
+    <script src="~/lib/fullcalendar/bootstrap/main.min.js"></script>
+
+    <script src="~/lib/bootstrap-colorpicker/bootstrap-colorpicker.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.5.0/js/bootstrap4-toggle.min.js"></script>
+
+    <script src="~/lib/Noty/noty.min.js" ></script>
+
+
+<script src="~/js/site.js" asp-append-version="true"></script>
+
+
+    @RenderSection("Scripts", required: false)
+
+    @RenderSection("ComponentsScripts", required: false)
+</body>
+</html>

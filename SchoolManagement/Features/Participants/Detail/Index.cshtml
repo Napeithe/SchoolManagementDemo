@@ -1,0 +1,78 @@
+﻿@using Model.Domain
+@using SchoolManagement.Features.Shared
+@model SchoolManagement.Features.Participants.Detail.ParticipantDetail
+@(await Html.PartialAsync("_title", new TitleViewModel($"Detale użytkownika: {Model.FirstName} {Model.LastName}",Url.Action("Index", "Anchors") )))
+    <div class="row mb-3">
+        <div class="col-12">
+            <form class="d-inline-block"
+                asp-action="UnAssignFromRole" asp-controller="RoleAssign" 
+                  asp-route-returnUrl="@Url.Action("Index", "Participants")" 
+                  asp-route-failBackUrl="@Url.Action("Detail", new {id = Model.Id})">
+                <input value="@Model.Id" name="UserId" class="d-none"/>
+                <input value="@Roles.Participant" name="RoleName" class="d-none"/>
+                <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt mr-2"></i>Usuń</button>
+            </form>
+        </div>
+    </div>
+<div class="row">
+    <div class="col-12">
+ 
+
+        <div class="card shadow mb-4">
+            <!-- Card Header - Accordion -->
+            <a href="#collapse" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapse">
+                <h6 class="m-0 font-weight-bold text-primary">Szczegóły użytkownika</h6>
+            </a>
+            <!-- Card Content - Collapse -->
+            <div class="collapse show" id="collapse">
+                <div class="card-body">
+                    <div class="row  ">
+                        <div class="col-sm col-md ">
+                            <div class="row border-bottom-light ">
+                                <div class="col-12 col-sm-6 col-md-4">
+                                    <strong>Imię</strong>
+                                </div>
+                                <div class="col-12 col-sm-6 col-md-8">
+                                    @Model.FirstName
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm col-md ">
+                            <div class="row border-bottom-light">
+                                <div class="col-12 col-sm-6 col-md-4">
+                                    <strong>Nazwisko</strong>
+                                </div>
+                                <div class="col-12 col-sm-6 col-md-8">
+                                    @Model.LastName
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row  ">
+                        <div class="col-sm col-md  ">
+                            <div class="row border-bottom-light ">
+                                <div class="col-12 col-sm-6 col-md-4">
+                                    <strong>E-mail</strong>
+                                </div>
+                                <div class="col-12 col-sm-6 col-md-8">
+                                    @Model.Email
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm">
+                            <div class="row border-bottom-light">
+                                <div class="col-12 col-sm-6 col-md-4">
+                                    <strong>Numer telefonu</strong>
+                                </div>
+                                <div class="col-12 col-sm-6 col-md-8">
+                                    @Model.PhoneNumber
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

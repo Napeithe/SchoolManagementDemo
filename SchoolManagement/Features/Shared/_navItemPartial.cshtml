@@ -1,0 +1,10 @@
+﻿@model SchoolManagement.Features.Shared.NavItemPartial
+@using SchoolManagement.Utils
+
+
+<li class="nav-item @Html.IsSelected(Model.ControllerName,Model.ActionName)">
+    <a class="nav-link" href="@Url.Action(Model.ActionName, Model.ControllerName)">
+        <i class="fas fa-fw @Model.Icon"></i>
+        <span>@Model.Title</span>
+    </a>
+</li>

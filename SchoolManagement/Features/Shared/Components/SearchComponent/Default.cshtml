@@ -1,0 +1,14 @@
+﻿@model SchoolManagement.Features.Shared.Components.SearchComponent.SearchViewModel
+
+<select id="@Model.Id" class="form-control"></select>
+
+<script asp-cut-key="selectComponent">
+    @if (!string.IsNullOrEmpty(Model.GetExcludedDelegate))
+    {
+        @:app.selectInitRemote("#@Model.Id", "@Model.Url", @Model.CallbackName, @Model.GetExcludedDelegate);
+    }
+    else
+    {
+        @:app.selectInitRemote("#@Model.Id", "@Model.Url", @Model.CallbackName);
+    }
+</script>

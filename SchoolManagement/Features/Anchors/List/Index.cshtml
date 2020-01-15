@@ -1,0 +1,28 @@
+﻿@using Model.Domain
+@using SchoolManagement.Features.Shared
+@model List<SchoolManagement.Features.Anchors.List.AnchorDto>
+
+@(await Html.PartialAsync("_title", new TitleViewModel("Prowadzący")))
+
+<div id="anchorsList"></div>
+
+<div class="row mt-3 mb-3">
+    <div class="col-12 col-sm-6 col-md-5 col-lg-4 col-xl-3 mt-1">
+            <a role="button" class="btn btn-secondary w-100" asp-controller="RoleAssign" asp-action="AssignRole" asp-route-returnUrl="@Url.Action("Index")" asp-route-roleName="@Roles.Anchor"><i class="fas fa-id-badge mr-2"></i>Przypisz użytkownika</a>
+    </div>
+    
+    <div class="col-12 col-sm-6 col-md-5 col-lg-4 col-xl-3 mt-1">
+        <a role="button" class="btn btn-primary w-100" asp-controller="Anchors" asp-action="AddNewUser"><i class="fas fa-user-plus mr-2"></i>Dodaj</a>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        var options = {
+            dataSet: @Html.Raw(Json.Serialize(Model)),
+            anchorDetail: '@Url.Action("Detail", "Anchors")'
+        }
+        app.listOfAnchors.init(options);
+    </script>
+}

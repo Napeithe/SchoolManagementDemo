@@ -1,0 +1,24 @@
+version: '3.4'
+
+services:
+  schoolmanagement:
+    image: ${DOCKER_REGISTRY-}schoolmanagement
+    build:
+      context: .
+      dockerfile: SchoolManagement/Dockerfile
+  schooldb:
+    container_name: schooldb
+    image: postgres:10.4
+    networks:
+      - default
+  dbadmin:
+    image: dpage/pgadmin4:latest
+    networks: 
+      - default
+  mailhog:
+    image: mailhog/mailhog
+    networks:
+      - default
+networks:
+  default:
+    driver: bridge

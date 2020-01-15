@@ -1,0 +1,87 @@
+﻿@using SchoolManagement.Features.Shared
+@using SchoolManagement.Features.Shared.Components.SelectComponent
+@using SchoolManagement.Features.Users.UserRoles
+@model SchoolManagement.Features.Users.Edit.Command
+
+@(await Html.PartialAsync("_title", new TitleViewModel("Edytuj użytkownika", Url.Action("Index"),Model.Id)))
+
+<div class="row">
+    <div class="col">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary"> Dane szczegółowe</h6>
+            </div>
+            <div class="card-body">
+                <form asp-action="EditUser">
+                    @Html.HiddenFor(x => x.Id)
+                    <div class="form-group">
+                        <label asp-for="FirstName">Imię</label>
+                        <input id="FirstName" class="form-control" asp-for="FirstName" placeholder="Imię" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="LastName">Nazwisko</label>
+                        <input class="form-control" asp-for="LastName" placeholder="Nazwisko" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Email">E-mail</label>
+                        <input id="Email" class="form-control" asp-for="Email" type="email" placeholder="E-mail" />
+                    </div>
+                    <div class="form-group">
+                        <label for="@nameof(Model.RolesId)">Wybierz role użytkownika</label>
+                        @await Component.InvokeAsync("SelectComponent", new
+                   {
+                       selectViewModel = new SelectViewModel(nameof(Model.RolesId), Model.RolesId),
+                       query = new Query() { SelectedId = Model.RolesId }
+                   })
+                        <span asp-validation-for="RolesId" class="text-danger"></span>
+                    </div>
+                    <div class="form-check">
+                        <input asp-for="IsEmailActivated" class="form-check-input" type="checkbox">
+                        <label asp-for="IsEmailActivated">Czy E-mail został aktywowany</label>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-success">Zapisz</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary"> Hasło</h6>
+            </div>
+            <div class="card-body">
+
+                <form asp-action="ChangePasswordForUser">
+                    @Html.HiddenFor(x => x.Id)
+                    <div class="form-group">
+                        <label name="NewPassword" id="LabelPassword">Nowe hasło</label>
+                        <input name="NewPassword" class="form-control" type="password" id="NewPassword" />
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-danger">Zmień hasło</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script asp-paste-key="selectComponent"></script>
+    <script>
+        let opt = {
+            backUrl: "@Url.Action("Index")",
+            removeUrl: "@Url.Action("Remove")",
+            title:"Usuwanie użytkownika",
+            content:"Czy na pewno chcesz usunąć użytkownika z systemu?"
+        }
+        app.removeDialog.init(opt);
+    </script>
+}

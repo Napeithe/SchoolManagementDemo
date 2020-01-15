@@ -1,0 +1,161 @@
+﻿@using Model.Auth
+@using SchoolManagement.Features.Shared
+@using SchoolManagement.Features.Shared.DetailPartial
+@using SchoolManagement.Infrastructure.Identity
+@using DayOfWeek = Model.Dto.DayOfWeek
+@model Model.Dto.GroupClasses.GroupClassDetail
+
+@(await Html.PartialAsync("_title", new TitleViewModel("Dodaj nową grupę zajęciową", Url.Action("Index"))))
+
+
+<div class="row mb-3">
+    <div class="col-12">
+        <div class=" d-flex justify-content-end">
+            <button class="btn btn-danger mr-2" onclick="app.removeDialog.showModal(`@Model.Id`)"><i class="fas fa-trash-alt mr-2"></i>Usuń</button>
+            <a asp-action="Edit" asp-route-groupId="@Model.Id" class="btn btn-primary mr-2" role="button"><span class="fas fa-edit mr-2"></span>Edytuj</a>
+            <a asp-action="Import" asp-route-groupId="@Model.Id" class="btn btn-info" role="button"> <span class="fas fa-file-import mr-2"></span>Import</a>
+        </div>
+    </div>
+    <div class="col">
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary"> Dane ogólne</h6>
+            </div>
+            <div class="card-body">
+                @(await Html.PartialAsync("~/Features/Shared/DetailPartial/Item.cshtml", new ItemDetail("Nazwa grupy", Model.GroupName)))
+                @(await Html.PartialAsync("~/Features/Shared/DetailPartial/Item.cshtml", new ItemDetail("Pokój", Model.RoomName)))
+                @(await Html.PartialAsync("~/Features/Shared/DetailPartial/Item.cshtml", new ItemDetail("Limit", Model.ParticipantLimits.ToString())))
+                @(await Html.PartialAsync("~/Features/Shared/DetailPartial/Item.cshtml", new ItemDetail("Poziom grupy", Model.GroupLevel)))
+                @(await Html.PartialAsync("~/Features/Shared/DetailPartial/Item.cshtml", new ItemDetail("Zajęcia solo", Model.IsSolo)))
+                @(await Html.PartialAsync("~/Features/Shared/DetailPartial/Item.cshtml", new ItemDetail("Prowadzący", Model.Anchors)))
+            </div>
+        </div>
+
+        <div class="card shadow mb-4">
+            <a href="#passData" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="passData">
+                <h6 class="m-0 font-weight-bold text-primary">Dane karnetu</h6>
+            </a>
+
+            <div class="collapse show" id="passData">
+                <div class="card-body">
+                    <div class="form-group">
+         
+                        @(await Html.PartialAsync("~/Features/Shared/DetailPartial/Item.cshtml", new ItemDetail("Cena", Model.PassPrice.ToString())))
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary"> Harmonogram</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <div class="col">
+                            <strong>Data ropoczęcia zajęć:</strong>
+                        </div>
+                        <div class="col">
+                            @Model.StartDate
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="col">
+                            <strong>Liczba zajęć w cyklu</strong>
+                        </div>
+                        <div class="col">
+                            @Model.NumberOfClasses
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="col">
+                            <strong>Czas trwania zajęć [m]</strong>
+                        </div>
+                        <div class="col">
+                            @Model.DurationTime
+                        </div>
+                    </div>
+                </div>
+                @if (!Model.ClassDayOfWeek.Any())
+                {
+                    <div class="row">
+                        <div class="col">Brak przypisanych dni do grupy</div>
+                    </div>
+                }
+                else
+                {
+                    var index = 1;
+                    @foreach (var day in Model.ClassDayOfWeek)
+                    {
+                        <div class="row mt-3">
+                            <h5>Termin @index</h5>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <strong>@DayOfWeek.GetItems.First(x => x.Value == ((int)day.DayOfWeek).ToString()).Text:</strong>
+
+                                @day.BeginTime.ToString()
+                            </div>
+                        </div>
+                        index++;
+                    }
+                }
+
+            </div>
+        </div>
+
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary"> Uczestnicy</h6>
+            </div>
+            <div class="card-body">
+                <table id="participantsTable" class="table table-bordered table-striped" width="100%"></table>
+            </div>
+        </div>
+
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Lista obecności</h6>
+            </div>
+            <div class="card-body">
+                <table id="participantPresenceTable" class="table table-bordered table-striped" width="100%">
+                    <thead>
+                        <tr></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts{
+    <script asp-paste-key="selectComponent"></script>
+    <script>
+        var options = {
+            presenceUrl: '@Url.Action("GetPresenceInGroup", "Presences", new {groupClassId = Model.Id})',
+            membersUrl: '@Url.Action("GetGroupMembers", new {groupClassId = Model.Id})',
+            changePresenceUrl: '@Url.Action("ChangePresenceForParticipant","Presences")',
+            memberDetail: '@Url.Action("Detail","GroupMember")',
+            changePassStatus: '@Url.Action("ChangePassStatus","GroupMember")',
+            userHasPermissionToSetPassAsPaid:
+                @(User.HasPermissionClaim(Permissions.Members.SetPassStatusAsPaid) ? "true" : "false")
+        };
+        app.groupClass.detail.init(options);
+
+        let removeOpt = {
+            backUrl: "@Url.Action("Index")",
+            removeUrl: "@Url.Action("Remove")",
+            title:"Usuwanie grupy zajęciowej",
+            content:"Czy na pewno chcesz usunąć grupę zajęciową z systemu?"
+        }
+        app.removeDialog.init(removeOpt);
+    </script>
+}

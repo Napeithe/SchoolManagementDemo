@@ -1,0 +1,104 @@
+﻿@using Model.Auth
+@using SchoolManagement.Features.Shared
+@using SchoolManagement.Features.Shared.Components.SearchComponent
+@using SchoolManagement.Infrastructure.Identity
+@model SchoolManagement.Features.Presences.GetPresenceInGroupOnDay.PresenceAtDay
+
+
+@(await Html.PartialAsync("_title",
+    new TitleViewModel("Lista obecności", Url.Action("Index", "Calendar"))))
+
+<div>
+    <h4>
+        @Model.GroupName, poziom @Model.Level, sala @Model.RoomName, dnia @Model.Time
+    </h4>
+</div>
+<div class="row">
+    <div class="col">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">List obecności</h6>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-12 col-lg-6">
+                        <div>Znajdź i dodaj uczestnika</div>
+                        @await Component.InvokeAsync("SearchComponent",
+                            new SearchViewModel("participantSearch",
+                                Url.Action("ParticipantSearch", "Participants"),
+                                "app.presence.show.addUser",
+                                "app.groupClass.add.getSelectedUser"))
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-lg-6">
+                        <h3>Zapisani uczestnicy</h3>
+                        <table id="participantPresenceTable" class="table table-bordered" width="100%">
+                            <thead>
+                                <tr>
+                                    <th>Uczestnik</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    var disabledChange = User.HasPermissionClaim(Permissions.Presence.ChangePresence) ? "" : "disabled";
+                                }
+                                @foreach (var participant in Model.Participants)
+                                {
+                                    <tr>
+                                        <td>@participant.Name</td>
+
+                                        <td>
+                                            <input type='checkbox' @(participant.IsPresence ? "checked" : "") data-toggle="toggle" @disabledChange data-onstyle="success" data-offstyle="danger" id='@participant.Id' data-participantId="@participant.ParticipantId" data-classTimeId="@Model.ClassTimeId" />
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12 col-lg-6">
+                        <h3>Dodatkowi uczestnicy</h3>
+                        <table id="additionalParticipantPresenceTable" class="table table-bordered" width="100%">
+                            <thead>
+                                <tr>
+                                    <th>Uczestnik</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                @foreach (var participant in Model.AdditionalParticipant)
+                                {
+                                    <tr>
+                                        <td>@participant.Name</td>
+
+                                        <td>
+                                            <button data-participantId="@participant.ParticipantId" data-presenceType="@((int)participant.PresenceType)"  @disabledChange class="btn btn-danger participant-remove" ><span class="fa fa-trash-alt"></span></button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+
+    <script asp-paste-key="selectComponent"></script>
+    <script>
+        let option = {
+            changePresenceUrl: '@Url.Action("ChangePresenceForParticipant")',
+            classTimeId: @Model.ClassTimeId,
+            getNewParticipantDetailUrl: '@Url.Action("GetUserOutOfGroupToAddToClass")'
+        }
+        app.presence.show.init(option);
+    </script>
+}

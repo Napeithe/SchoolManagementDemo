@@ -1,0 +1,31 @@
+﻿@using SchoolManagement.Features.Shared
+@model SchoolManagement.Features.RoleAssign.Assign.RoleAssignViewModel
+
+@await Html.PartialAsync("_title", new TitleViewModel($"Dodaj istniejącego użytkownika do roli: {Model.RoleDescription}", Url.Action("Index","Anchors")))
+<div class="row">
+    <div class="col">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Znajdź użytkownika</h6>
+            </div>
+            <div class="card-body">
+                <form asp-action="AssignRoleAction">
+                    <div class="form-group col-12 col-sm-8">
+                        <label for="userList">Wybierz użytkownika</label>
+                        @Html.HiddenFor(x=>x.ReturnUrl)
+                        @Html.HiddenFor(x=>x.RoleName)
+                        <select name="UserId" id="userList" asp-items="Model.Users" class="form-control"></select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Przypisz</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        app.anchors.assign.init();
+    </script>
+}

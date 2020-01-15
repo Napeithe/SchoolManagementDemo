@@ -1,0 +1,14 @@
+﻿@model SchoolManagement.Features.Shared.Components.SelectComponent.SelectViewModel
+
+@if (Model.IsMultiple)
+{
+    <select id="@Model.Id" name="@(Model.For)" multiple="multiple" class="form-control" asp-items="Model.Items"></select>
+}
+else
+{
+    <select id="@Model.Id" name="@Model.For" class="form-control" asp-items="Model.Items"></select>
+}
+
+    <script asp-cut-key="selectComponent">
+        app.selectInit("#@Model.Id")
+    </script>

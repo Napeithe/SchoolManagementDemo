@@ -1,0 +1,28 @@
+﻿@using Model.Domain
+@using SchoolManagement.Features.Shared
+@model List<Model.Dto.ParticipantItemDto>
+
+@(await Html.PartialAsync("_title", new TitleViewModel("Uczestnicy")))
+
+<div id="participantList"></div>
+
+<div class="row mt-3 mb-3">
+    <div class="col-12 col-sm-6 col-md-5 col-lg-4 col-xl-3 mt-1">
+            <a role="button" class="btn btn-secondary w-100" asp-controller="RoleAssign" asp-action="AssignRole" asp-route-returnUrl="@Url.Action("Index")" asp-route-roleName="@Roles.Participant"><i class="fas fa-id-badge mr-2"></i>Przypisz użytkownika</a>
+    </div>
+    
+    <div class="col-12 col-sm-6 col-md-5 col-lg-4 col-xl-3 mt-1">
+        <a role="button" class="btn btn-primary w-100" asp-controller="Participants" asp-action="AddNewUser"><i class="fas fa-user-plus mr-2"></i>Dodaj</a>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        var options = {
+            dataSet: @Html.Raw(Json.Serialize(Model)),
+            participantDetail: '@Url.Action("Detail", "Participants")'
+        }
+        app.listOfParticipants.init(options);
+    </script>
+}
